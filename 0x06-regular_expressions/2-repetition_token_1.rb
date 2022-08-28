@@ -1,4 +1,2 @@
 #!/usr/bin/env ruby
-# Match "hbtn, htn" not "hbbtn or hbbbtn"
-
-puts ARGV[0].scan(/hb?tn/).join
+puts ARGV[0].scan(/h+[b|t]t?n/).join

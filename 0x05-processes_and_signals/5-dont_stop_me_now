@@ -1,3 +1,4 @@
 #!/usr/bin/env bash
-# Script bash kills the 4-to_infinity_and_beyond when script is running
-kill "$(pgrep -f ./4-to_infinity_and_beyond)"
+# stop to infinity and beyond
+
+kill "$(pgrep -f 4-to_infinity_and_beyond)"
