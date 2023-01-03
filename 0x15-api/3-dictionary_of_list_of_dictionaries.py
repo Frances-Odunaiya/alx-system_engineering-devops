@@ -1,27 +1,42 @@
 #!/usr/bin/python3
-"""Returns to-do list information for a given employee ID."""
-import json
-import requests
+""" Dictionary of list of dictionaries  """
 
+if __name__ == "__main__":
+    import json
+    from requests import get
 
-if __name__ == '__main__':
-    url = "https://jsonplaceholder.typicode.com"
+    url_user = "https://jsonplaceholder.typicode.com/users"
+    url_todo = "https://jsonplaceholder.typicode.com/todos"
 
-    users = requests.get("{}/users".format(url)).json()
-    todos = requests.get(url + "/todos").json()
+    r_user = get(url_user)
+    r_todo = get(url_todo)
 
-    dict = {}
-    for user in users:
-        arr = []
-        user_id = user.get('id')
-        for todo in todos:
-            if user.get('id') == todo.get('userId'):
-                arr.append({'task': todo.get('title'),
-                            'completed': todo.get('completed'),
-                            'username': user.get('username')})
-        dict[user_id] = arr
+    try:
+        js_user = r_user.json()
+        js_todo = r_todo.json()
 
-    filename = "todo_all_employees.json"
-    with open(filename, "w", encoding="utf-8") as json_file:
-        json_text = json.dumps(dict)
-        json_file.write(json_text)
+    except ValueError:
+        print("Not a valid JSON")
+
+    if js_user and js_todo:
+        data = {}
+        user_names = {}
+        for user in js_user:
+            USER_ID = user.get('id')
+            USERNAME = user.get('username')
+            data[USER_ID] = []
+            user_names[USER_ID] = USERNAME
+
+        for todo in js_todo:
+            TASK_COMPLETED_STATUS = todo.get("completed")
+            TASK_TITLE = todo.get('title')
+            user_id = todo.get("userId")
+            dic = {"task": TASK_TITLE,
+                   "completed": TASK_COMPLETED_STATUS,
+                   "username": user_names.get(user_id)}
+
+            if data.get(user_id) is not None:
+                data.get(user_id).append(dic)
+
+        with open('todo_all_employees.json', 'w', newline='') as jsonfile:
+            json.dump(data, jsonfile)

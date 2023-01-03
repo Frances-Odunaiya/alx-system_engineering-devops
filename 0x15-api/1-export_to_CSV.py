@@ -1,27 +1,41 @@
 #!/usr/bin/python3
-"""
-Module 0-gather_data_from_an_API
-"""
+""" Export to CSV  """
 
-import csv
-import requests
-from sys import argv
+if __name__ == "__main__":
+    import csv
+    from requests import get
+    from sys import argv, exit
 
-if __name__ == '__main__':
+    try:
+        id = argv[1]
+        is_int = int(id)
+    except:
+        exit()
 
-    id = argv[1]
-    user_url = 'https://jsonplaceholder.typicode.com/users/{}'.format(
-        id)
-    response = requests.get(user_url)
-    username = response.json().get('username')
-    todo_url = 'https://jsonplaceholder.typicode.com/todos?userId={}'.format(
-        id)
-    todo = requests.get(todo_url).json()
+    url_user = "https://jsonplaceholder.typicode.com/users?id=" + id
+    url_todo = "https://jsonplaceholder.typicode.com/todos?userId=" + id
 
-    with open('{}.csv'.format(id), 'w', encoding='UTF8', newline='') as f:
-        writer = csv.writer(f, quoting=csv.QUOTE_ALL)
+    r_user = get(url_user)
+    r_todo = get(url_todo)
 
-        for task in todo:
-            task_status = task.get('completed')
-            task_title = task.get('title')
-            writer.writerow([id, username, task_status, task_title])
+    try:
+        js_user = r_user.json()
+        js_todo = r_todo.json()
+
+    except ValueError:
+        print("Not a valid JSON")
+
+    if js_user and js_todo:
+        USER_ID = id
+        USERNAME = js_user[0].get('username')
+
+        with open(id + '.csv', 'w', newline='') as csvfile:
+            spamwriter = csv.writer(csvfile, delimiter=',',
+                                    quotechar='"', quoting=csv.QUOTE_ALL)
+            for todo in js_todo:
+                TASK_COMPLETED_STATUS = todo.get("completed")
+                TASK_TITLE = todo.get('title')
+                spamwriter.writerow([USER_ID,
+                                     USERNAME,
+                                     TASK_COMPLETED_STATUS,
+                                     TASK_TITLE])
